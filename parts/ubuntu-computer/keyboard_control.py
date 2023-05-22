@@ -14,34 +14,43 @@ def getch():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     return ch
 
-# Replace '/dev/ttyACM0' with the appropriate port for your Arduino
-arduino = serial.Serial('/dev/ttyUSB0', 9600) #ttyUSB0
-time.sleep(2)  # Give time for the connection to initialize
+# Set up the serial connection
+print("Setting up serial connection...")
+ser = serial.Serial('/dev/ttyUSB0', 9600)  # Change this to the appropriate port for your Arduino Nano
+time.sleep(2)  # Wait for the connection to be established
 
-relayStatus = False
+# Check if the serial connection is open
+if ser.isOpen():
+    print("Serial connection established!")
+else:
+    print("Failed to establish serial connection.")
+    sys.exit()
 
-print("Press 'q' to quit")
+# Control the stepper motor with the keyboard
+print("Press '1' and '2' to control the stepper motor. '7' and '8' for the servo. Press 'q' to exit.")
 while True:
-    key = getch()
-    if key == 'q':
+    key_name = getch()
+    if key_name == 'q':
         break
-    elif key == ' ':  # Space bar
-        if relayStatus:
-            arduino.write(b'f')
-        else:
-            arduino.write(b'o')
-        relayStatus = not relayStatus
-    elif key == '\x1b':  # Check for arrow key escape sequence
-        key = getch()
-        if key == '[':
-            key = getch()
-            if key == 'A':  # Up arrow
-                arduino.write(b'u')
-            elif key == 'B':  # Down arrow
-                arduino.write(b'd')
-            elif key == 'C':  # Right arrow
-                arduino.write(b'r')
-            elif key == 'D':  # Left arrow
-                arduino.write(b'l')
+    elif key_name == '1':
+        ser.write(b'R')
+        print("Sent 'R' command for Right rotation")
+    elif key_name == '2':
+        ser.write(b'L')
+        print("Sent 'L' command for Left rotation")
+    elif key_name == '7':
+        ser.write(b'7')
+        print("Sent '7' command to turn the servo left")
+    elif key_name == '8':
+        ser.write(b'8')
+        print("Sent '8' command to turn the servo right")
 
-arduino.close()
+# Close the serial connection
+print("Closing serial connection...")
+ser.close()
+
+# Check if the serial connection is closed
+if not ser.isOpen():
+    print("Serial connection closed!")
+else:
+    print("Failed to close serial connection.")
