@@ -27,7 +27,7 @@ else:
     sys.exit()
 
 # Control the stepper motor with the keyboard
-print("Press '1' and '2' to control the stepper motor. '7' and '8' for the servo. Press 'q' to exit.")
+print("Press '1' and '2' to control the stepper motor. '7' and '8' for the first servo. '4' and '5' for the second servo. '6' to toggle relay. Press 'q' to exit.")
 while True:
     key_name = getch()
     if key_name == 'q':
@@ -44,6 +44,15 @@ while True:
     elif key_name == '8':
         ser.write(b'8')
         print("Sent '8' command to turn the servo right")
+    elif key_name == '4':
+        ser.write(b'4')
+        print("Sent '4' command to turn the second servo left")
+    elif key_name == '5':
+        ser.write(b'5')
+        print("Sent '5' command to turn the second servo right")
+    elif key_name == '6':
+        ser.write(b'6')
+        print("Sent '6' command to toggle relay state")
 
 # Close the serial connection
 print("Closing serial connection...")

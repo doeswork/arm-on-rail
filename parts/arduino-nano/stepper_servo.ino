@@ -4,12 +4,15 @@
 #define IN2 9
 #define IN3 10
 #define IN4 11
+#define RELAY_PIN 12  // Relay connected on pin 12
 int Steps = 0;
 boolean Direction = true; // True: Clockwise, False: Counter-Clockwise
 int stepsPerCommand = 4096; // Number of steps to take per command
 
-Servo myservo;  // Create servo object
-int pos = 0;    // Variable to store the servo position
+Servo myservo1;  // Create first servo object
+Servo myservo2;  // Create second servo object
+int pos1 = 0;    // Variable to store the servo1 position
+int pos2 = 0;    // Variable to store the servo2 position
 
 void setup() {
   Serial.begin(9600);
@@ -17,8 +20,12 @@ void setup() {
   pinMode(IN2, OUTPUT);
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
-  myservo.attach(6); // Attaches the servo on pin 6
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, LOW);  // Ensure relay is off to start
+  myservo1.attach(6); // Attaches the first servo on pin 6
+  myservo2.attach(7); // Attaches the second servo on pin 7
 }
+
 
 void loop() {
   if (Serial.available() > 0) {
@@ -36,11 +43,25 @@ void loop() {
         delayMicroseconds(800);
       }
     } else if (command == '7') {
-      pos = max(0, pos - 15); // Decrease servo position
-      myservo.write(pos);
+      pos1 = max(0, pos1 - 15); // Decrease servo position
+      myservo1.write(pos1);
     } else if (command == '8') {
-      pos = min(180, pos + 15); // Increase servo position
-      myservo.write(pos);
+      pos1 = min(180, pos1 + 15); // Increase servo position
+      myservo1.write(pos1);
+    }
+    else if (command == '4') {
+      pos2 = max(0, pos2 - 15); // Decrease second servo position
+      myservo2.write(pos2);
+    } else if (command == '5') {
+      pos2 = min(180, pos2 + 15); // Increase second servo position
+      myservo2.write(pos2);
+    } else if (command == '6') {
+      // Toggle the relay state
+      if (digitalRead(RELAY_PIN) == HIGH) {
+        digitalWrite(RELAY_PIN, LOW);  // Turn off relay
+      } else {
+        digitalWrite(RELAY_PIN, HIGH); // Turn on relay
+      }
     }
   }
 }
